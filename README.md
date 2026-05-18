@@ -3,6 +3,21 @@
 A local dashboard to manage your AI accounts — track usage limits, organize projects and copy prompts in one click. No cloud, no subscriptions, runs entirely on your machine.
 
 > También disponible en español más abajo.
+---
+### Screenshots
+
+**Vista general**
+![Vista general](pagina_principal.png)
+
+**Proyectos y prompts**
+![Paso 1 creacion proyecto](registrar_proyecto_1.png)
+![Paso 2 creacion proyecto](registrar_proyecto_2.png)
+
+**Vista desplegada con proyecto**
+![Vista con proyectos](acceder_proyectos_guardados.png)
+
+**Añadir cuenta**
+![Añadir cuenta](screenshot-añadir.png)
 
 ---
 
