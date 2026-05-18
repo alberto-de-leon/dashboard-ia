@@ -15,10 +15,6 @@ A local dashboard to manage your AI accounts — track usage limits, organize pr
 
 **Vista desplegada con proyecto**
 ![Vista con proyectos](acceder_proyectos_guardados.png)
-
-**Añadir cuenta**
-![Añadir cuenta](screenshot-añadir.png)
-
 ---
 
 ## 🇬🇧 English
