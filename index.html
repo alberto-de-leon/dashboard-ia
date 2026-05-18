@@ -1,0 +1,1272 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Workspace Dashboard</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
+  <style>
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      transition: background .25s ease, color .25s ease;
+    }
+
+    body.light {
+      background:
+        radial-gradient(circle at top left, rgba(59,130,246,.08), transparent 25%),
+        radial-gradient(circle at top right, rgba(217,119,87,.08), transparent 25%),
+        linear-gradient(to bottom, #f8fafc, #eef2ff);
+
+      color: #0f172a;
+    }
+
+    body.dark {
+      background:
+        radial-gradient(circle at top left, rgba(59,130,246,.12), transparent 25%),
+        radial-gradient(circle at top right, rgba(217,119,87,.12), transparent 25%),
+        linear-gradient(to bottom, #020617, #0f172a);
+
+      color: #f8fafc;
+    }
+
+    .glass {
+      backdrop-filter: blur(14px);
+    }
+
+    body.light .glass {
+      background: rgba(255,255,255,.72);
+      border: 1px solid rgba(255,255,255,.6);
+    }
+
+    body.dark .glass {
+      background: rgba(15,23,42,.72);
+      border: 1px solid rgba(255,255,255,.06);
+    }
+
+    .row-hover {
+      transition: all .2s ease;
+    }
+
+    .row-hover:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 12px 35px rgba(0,0,0,.08);
+    }
+
+    .fade-in {
+      animation: fade .25s ease;
+    }
+
+    @keyframes fade {
+      from { opacity: 0; transform: translateY(6px); }
+      to   { opacity: 1; transform: translateY(0px); }
+    }
+
+    body.light .search-input {
+      background: rgba(255,255,255,.72);
+      border-color: rgba(59,130,246,.25);
+      color: #0f172a;
+    }
+    body.light .search-input:focus {
+      border-color: rgba(59,130,246,.6);
+    }
+    body.dark .search-input {
+      background: rgba(15,23,42,.72);
+      border-color: rgba(59,130,246,.3);
+      color: #f8fafc;
+    }
+    body.dark .search-input:focus {
+      border-color: rgba(59,130,246,.7);
+    }
+
+  </style>
+</head>
+
+<body class="light min-h-screen font-sans p-5 md:p-8">
+
+  <div class="max-w-7xl mx-auto">
+
+    <!-- HEADER CARD -->
+
+    <header class="glass rounded-3xl px-7 py-5 mb-5 shadow-sm overflow-visible relative">
+
+      <!-- Title row -->
+      <h1 class="text-2xl font-black tracking-tight mb-5">
+        Dashboard IA
+      </h1>
+
+      <!-- Controls row -->
+      <div class="flex items-center gap-3">
+
+        <!-- Search -->
+        <div class="relative flex-shrink-0">
+          <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 11A6 6 0 105 11a6 6 0 0012 0z"/>
+          </svg>
+          <input
+            id="search-input"
+            type="text"
+            placeholder="Buscar por correo..."
+            oninput="render()"
+            class="search-input w-56 rounded-xl border pl-9 pr-4 py-2.5 outline-none text-sm"
+          />
+        </div>
+
+        <!-- Filter dropdown -->
+        <div id="filters" class="flex flex-wrap gap-2"></div>
+
+        <!-- Add account -->
+        <button
+          onclick="openModal()"
+          class="bg-black text-white px-4 py-2.5 rounded-xl text-sm font-semibold shadow hover:opacity-90 transition cursor-pointer flex items-center gap-1.5 flex-shrink-0">
+          + Añadir cuenta
+        </button>
+
+        <!-- Spacer -->
+        <div class="flex-1"></div>
+
+        <!-- Theme toggle -->
+        <button
+          id="theme-btn"
+          onclick="toggleTheme()"
+          class="glass w-10 h-10 rounded-xl shadow-sm hover:scale-[1.02] transition cursor-pointer flex items-center justify-center flex-shrink-0">
+          <!-- Moon (light mode) -->
+          <svg id="icon-moon" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M21 12.79A9 9 0 1111.21 3a7 7 0 009.79 9.79z"/>
+          </svg>
+          <!-- Sun (dark mode) -->
+          <svg id="icon-sun" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="5"/>
+            <line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+            <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+          </svg>
+        </button>
+
+      </div>
+    </header>
+
+
+    <!-- ACCOUNTS -->
+
+    <section id="accounts-container" class="space-y-3"></section>
+
+  </div>
+
+
+  <!-- MODAL ADD -->
+
+  <div id="modal-add" class="fixed inset-0 bg-black/40 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-3xl p-6 w-full max-w-lg shadow-2xl fade-in text-slate-800">
+
+      <div class="flex items-center justify-between mb-5">
+        <h3 class="text-2xl font-bold">Añadir</h3>
+        <button onclick="closeModal()" class="text-xl text-slate-400 hover:text-black cursor-pointer">✕</button>
+      </div>
+
+      <!-- Tabs -->
+      <div class="flex gap-1 bg-slate-100 rounded-2xl p-1 mb-6">
+        <button id="tab-account" onclick="switchTab('account')"
+          class="flex-1 py-2 rounded-xl text-sm font-semibold transition cursor-pointer bg-white shadow-sm text-slate-800">
+          Nueva cuenta IA
+        </button>
+        <button id="tab-provider" onclick="switchTab('provider')"
+          class="flex-1 py-2 rounded-xl text-sm font-semibold transition cursor-pointer text-slate-500">
+          Nueva IA
+        </button>
+      </div>
+
+      <!-- Tab: Nueva cuenta -->
+      <div id="panel-account" class="space-y-4">
+        <div>
+          <label class="block text-sm font-semibold mb-2">Correo</label>
+          <input id="new-email" type="email" placeholder="mail@ejemplo.com"
+            class="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none focus:border-slate-400"/>
+        </div>
+        <div>
+          <label class="block text-sm font-semibold mb-2">Proveedor IA</label>
+          <select id="new-ia"
+            class="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none focus:border-slate-400"></select>
+        </div>
+        <div>
+          <label class="block text-sm font-semibold mb-2">Tags</label>
+          <input id="new-tags" type="text" placeholder="web, testing, automation"
+            class="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none focus:border-slate-400"/>
+        </div>
+        <div class="flex justify-end gap-3 pt-2">
+          <button onclick="closeModal()" class="px-5 py-3 rounded-2xl bg-slate-100 hover:bg-slate-200 text-sm font-semibold cursor-pointer">Cancelar</button>
+          <button onclick="addNewAccount()" class="px-5 py-3 rounded-2xl bg-black text-white text-sm font-semibold hover:opacity-90 cursor-pointer">Guardar cuenta</button>
+        </div>
+      </div>
+
+      <!-- Tab: Nueva IA -->
+      <div id="panel-provider" class="space-y-4 hidden">
+        <div>
+          <label class="block text-sm font-semibold mb-2">Nombre</label>
+          <input id="new-provider-name" type="text" placeholder="Ej: Mistral"
+            class="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none focus:border-slate-400"/>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-sm font-semibold mb-2">Color del frame <span class="font-normal text-slate-400">(degradado)</span></label>
+            <div class="flex items-center gap-2">
+              <input id="new-provider-color1" type="color" value="#e0f2fe" class="w-10 h-10 rounded-xl border border-slate-200 cursor-pointer p-1"/>
+              <span class="text-slate-400 text-sm">→</span>
+              <input id="new-provider-color2" type="color" value="#f0f9ff" class="w-10 h-10 rounded-xl border border-slate-200 cursor-pointer p-1"/>
+            </div>
+          </div>
+          <div>
+            <label class="block text-sm font-semibold mb-2">Color botón Límite</label>
+            <input id="new-provider-btn-color" type="color" value="#3b82f6" class="w-10 h-10 rounded-xl border border-slate-200 cursor-pointer p-1"/>
+          </div>
+        </div>
+        <div>
+          <label class="block text-sm font-semibold mb-2">SVG del icono <span class="font-normal text-slate-400">(pega el código completo)</span></label>
+          <textarea id="new-provider-svg" rows="5" placeholder='<svg viewBox="0 0 24 24" ...>...</svg>'
+            class="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none focus:border-slate-400 font-mono text-xs leading-relaxed"></textarea>
+        </div>
+        <div class="flex justify-end gap-3 pt-2">
+          <button onclick="closeModal()" class="px-5 py-3 rounded-2xl bg-slate-100 hover:bg-slate-200 text-sm font-semibold cursor-pointer">Cancelar</button>
+          <button onclick="addNewProvider()" class="px-5 py-3 rounded-2xl bg-black text-white text-sm font-semibold hover:opacity-90 cursor-pointer">Guardar IA</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- MODAL EDIT ACCOUNT -->
+
+  <div id="modal-edit" class="fixed inset-0 bg-black/40 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-3xl p-6 w-full max-w-lg shadow-2xl fade-in text-slate-800">
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <h3 class="text-2xl font-bold">Editar cuenta</h3>
+          <p class="text-sm text-slate-500 mt-1">Modifica los datos de esta cuenta.</p>
+        </div>
+        <button onclick="closeEditModal()" class="text-xl text-slate-400 hover:text-black cursor-pointer">✕</button>
+      </div>
+      <input type="hidden" id="edit-account-id"/>
+      <div class="space-y-4">
+        <div>
+          <label class="block text-sm font-semibold mb-2">Correo</label>
+          <input id="edit-email" type="email"
+            class="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none focus:border-slate-400"/>
+        </div>
+        <div>
+          <label class="block text-sm font-semibold mb-2">Proveedor IA</label>
+          <select id="edit-ia"
+            class="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none focus:border-slate-400"></select>
+        </div>
+        <div>
+          <label class="block text-sm font-semibold mb-2">Tags</label>
+          <input id="edit-tags" type="text" placeholder="web, testing, automation"
+            class="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none focus:border-slate-400"/>
+        </div>
+        <div class="flex justify-end gap-3 pt-2">
+          <button onclick="closeEditModal()" class="px-5 py-3 rounded-2xl bg-slate-100 hover:bg-slate-200 text-sm font-semibold cursor-pointer">Cancelar</button>
+          <button onclick="saveEditAccount()" class="px-5 py-3 rounded-2xl bg-black text-white text-sm font-semibold hover:opacity-90 cursor-pointer">Guardar cambios</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- MODAL PROJECT (new/edit) -->
+
+  <div id="modal-project" class="fixed inset-0 bg-black/40 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-3xl p-6 w-full max-w-lg shadow-2xl fade-in text-slate-800 max-h-[90vh] overflow-y-auto">
+
+      <div class="flex items-center justify-between mb-6">
+        <h3 id="project-modal-title" class="text-xl font-bold">Nuevo proyecto</h3>
+        <button onclick="closeProjectModal()" class="text-xl text-slate-400 hover:text-black cursor-pointer">✕</button>
+      </div>
+
+      <div class="space-y-4">
+        <div>
+          <label class="block text-sm font-semibold mb-2">Nombre del proyecto</label>
+          <input id="project-name" type="text" placeholder="Ej: App SaaS"
+            class="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none focus:border-slate-400 text-sm"/>
+        </div>
+        <div>
+          <label class="block text-sm font-semibold mb-2">Descripción <span class="font-normal text-slate-400">(opcional)</span></label>
+          <input id="project-description" type="text" placeholder="Breve descripción del proyecto"
+            class="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none focus:border-slate-400 text-sm"/>
+        </div>
+
+        <div>
+          <div class="flex items-center justify-between mb-2">
+            <label class="block text-sm font-semibold">Prompts</label>
+            <button onclick="addPromptRow()" class="text-xs font-semibold text-slate-500 hover:text-black cursor-pointer flex items-center gap-1">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+              </svg>
+              Añadir prompt
+            </button>
+          </div>
+          <div id="prompts-list" class="space-y-2"></div>
+          <p id="prompts-empty" class="text-xs text-slate-400 italic mt-1">Sin prompts todavía. Pulsa "Añadir prompt" para crear uno.</p>
+        </div>
+      </div>
+
+      <div class="flex justify-end gap-3 mt-6">
+        <button onclick="closeProjectModal()" class="px-5 py-3 rounded-2xl bg-slate-100 hover:bg-slate-200 text-sm font-semibold cursor-pointer">Cancelar</button>
+        <button onclick="saveProject()" class="px-5 py-3 rounded-2xl bg-black text-white text-sm font-semibold hover:opacity-90 cursor-pointer">Guardar proyecto</button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- MODAL LIMIT -->
+
+  <div id="modal-limit" class="fixed inset-0 bg-black/40 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-3xl p-6 w-full max-w-sm shadow-2xl fade-in text-slate-800">
+
+      <div class="flex items-center justify-between mb-5">
+        <div>
+          <h3 class="text-xl font-bold">Editar límite</h3>
+          <p class="text-sm text-slate-500 mt-1">¿A qué hora se desbloquea la cuenta?</p>
+        </div>
+        <button onclick="closeLimitModal()" class="text-xl text-slate-400 hover:text-black cursor-pointer">✕</button>
+      </div>
+
+      <input type="hidden" id="limit-account-id" />
+
+      <div class="mb-5">
+        <label class="block text-sm font-semibold mb-2">Hora de desbloqueo</label>
+        <input
+          id="limit-time-input"
+          type="time"
+          class="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none focus:border-slate-400 text-slate-800 text-lg font-semibold"
+        />
+        <p class="text-xs text-slate-400 mt-2">Si la hora ya pasó hoy, se asignará para mañana. Déjalo vacío para quitar el límite.</p>
+      </div>
+
+      <div class="flex justify-end gap-3">
+        <button onclick="closeLimitModal()" class="px-5 py-3 rounded-2xl bg-slate-100 hover:bg-slate-200 text-sm font-semibold cursor-pointer">Cancelar</button>
+        <button onclick="saveLimit()" class="px-5 py-3 rounded-2xl bg-black text-white text-sm font-semibold hover:opacity-90 cursor-pointer">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+
+  <script>
+
+    // =====================================================
+    // PROVIDERS
+    // =====================================================
+
+    const providers = {
+
+      claude: {
+        label: 'Claude',
+        gradient: 'from-orange-100 to-orange-50',
+        button: 'bg-[#D97757]',
+        icon: `<svg height="1em" style="flex:none;line-height:1" viewBox="0 0 24 24" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M4.709 15.955l4.72-2.647.08-.23-.08-.128H9.2l-.79-.048-2.698-.073-2.339-.097-2.266-.122-.571-.121L0 11.784l.055-.352.48-.321.686.06 1.52.103 2.278.158 1.652.097 2.449.255h.389l.055-.157-.134-.098-.103-.097-2.358-1.596-2.552-1.688-1.336-.972-.724-.491-.364-.462-.158-1.008.656-.722.881.06.225.061.893.686 1.908 1.476 2.491 1.833.365.304.145-.103.019-.073-.164-.274-1.355-2.446-1.446-2.49-.644-1.032-.17-.619a2.97 2.97 0 01-.104-.729L6.283.134 6.696 0l.996.134.42.364.62 1.414 1.002 2.229 1.555 3.03.456.898.243.832.091.255h.158V9.01l.128-1.706.237-2.095.23-2.695.08-.76.376-.91.747-.492.584.28.48.685-.067.444-.286 1.851-.559 2.903-.364 1.942h.212l.243-.242.985-1.306 1.652-2.064.73-.82.85-.904.547-.431h1.033l.76 1.129-.34 1.166-1.064 1.347-.881 1.142-1.264 1.7-.79 1.36.073.11.188-.02 2.856-.606 1.543-.28 1.841-.315.833.388.091.395-.328.807-1.969.486-2.309.462-3.439.813-.042.03.049.061 1.549.146.662.036h1.622l3.02.225.79.522.474.638-.079.485-1.215.62-1.64-.389-3.829-.91-1.312-.329h-.182v.11l1.093 1.068 2.006 1.81 2.509 2.33.127.578-.322.455-.34-.049-2.205-1.657-.851-.747-1.926-1.62h-.128v.17l.444.649 2.345 3.521.122 1.08-.17.353-.608.213-.668-.122-1.374-1.925-1.415-2.167-1.143-1.943-.14.08-.674 7.254-.316.37-.729.28-.607-.461-.322-.747.322-1.476.389-1.924.315-1.53.286-1.9.17-.632-.012-.042-.14.018-1.434 1.967-2.18 2.945-1.726 1.845-.414.164-.717-.37.067-.662.401-.589 2.388-3.036 1.44-1.882.93-1.086-.006-.158h-.055L4.132 18.56l-1.13.146-.487-.456.061-.746.231-.243 1.908-1.312-.006.006z" fill="#D97757"></path></svg>`
+      },
+
+      chatgpt: {
+        label: 'ChatGPT',
+        gradient: 'from-zinc-200 to-zinc-100',
+        button: 'bg-black',
+        icon: `<svg class="w-6 h-6" viewBox="0 0 24 24" fill="#000" xmlns="http://www.w3.org/2000/svg"><path d="M9.205 8.658v-2.26c0-.19.072-.333.238-.428l4.543-2.616c.619-.357 1.356-.523 2.117-.523 2.854 0 4.662 2.212 4.662 4.566 0 .167 0 .357-.024.547l-4.71-2.759a.797.797 0 00-.856 0l-5.97 3.473zm10.609 8.8V12.06c0-.333-.143-.57-.429-.737l-5.97-3.473 1.95-1.118a.433.433 0 01.476 0l4.543 2.617c1.309.76 2.189 2.378 2.189 3.948 0 1.808-1.07 3.473-2.76 4.163zM7.802 12.703l-1.95-1.142c-.167-.095-.239-.238-.239-.428V5.899c0-2.545 1.95-4.472 4.591-4.472 1 0 1.927.333 2.712.928L8.23 5.067c-.285.166-.428.404-.428.737v6.898zM12 15.128l-2.795-1.57v-3.33L12 8.658l2.795 1.57v3.33L12 15.128zm1.796 7.23c-1 0-1.927-.332-2.712-.927l4.686-2.712c.285-.166.428-.404.428-.737v-6.898l1.974 1.142c.167.095.238.238.238.428v5.233c0 2.545-1.974 4.472-4.614 4.472zm-5.637-5.303l-4.544-2.617c-1.308-.761-2.188-2.378-2.188-3.948A4.482 4.482 0 014.21 6.327v5.423c0 .333.143.571.428.738l5.947 3.449-1.95 1.118a.432.432 0 01-.476 0zm-.262 3.9c-2.688 0-4.662-2.021-4.662-4.519 0-.19.024-.38.047-.57l4.686 2.71c.286.167.571.167.856 0l5.97-3.448v2.26c0 .19-.07.333-.237.428l-4.543 2.616c-.619.357-1.356.523-2.117.523zm5.899 2.83a5.947 5.947 0 005.827-4.756C22.287 18.339 24 15.84 24 13.296c0-1.665-.713-3.282-1.998-4.448.119-.5.19-.999.19-1.498 0-3.401-2.759-5.947-5.946-5.947-.642 0-1.26.095-1.88.31A5.962 5.962 0 0010.205 0a5.947 5.947 0 00-5.827 4.757C1.713 5.447 0 7.945 0 10.49c0 1.666.713 3.283 1.998 4.448-.119.5-.19 1-.19 1.499 0 3.401 2.759 5.946 5.946 5.946.642 0 1.26-.095 1.88-.309a5.96 5.96 0 004.162 1.713z"></path></svg>`
+      },
+
+      gemini: {
+        label: 'Gemini',
+        gradient: 'from-sky-200 to-sky-100',
+        button: 'bg-[#2B82D9]',
+        icon: `<svg fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path d="M16 8.016A8.522 8.522 0 008.016 16h-.032A8.521 8.521 0 000 8.016v-.032A8.521 8.521 0 007.984 0h.032A8.522 8.522 0 0016 7.984v.032z" fill="url(#g)"></path><defs><radialGradient id="g" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="matrix(16.1326 5.4553 -43.70045 129.2322 1.588 6.503)"><stop offset=".067" stop-color="#9168C0"></stop><stop offset=".343" stop-color="#5684D1"></stop><stop offset=".672" stop-color="#1BA1E3"></stop></radialGradient></defs></svg>`
+      }
+    };
+
+
+    // =====================================================
+    // DATA
+    // =====================================================
+
+
+    let accounts = [];
+    let activeFilter = 'all';
+
+    async function loadAccounts() {
+      try {
+        const res = await fetch('/accounts.json');
+        accounts = await res.json();
+      } catch(e) {
+        accounts = [];
+      }
+    }
+
+    async function save() {
+      try {
+        await fetch('/save', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(accounts, null, 2)
+        });
+      } catch(e) {
+        console.error('Error guardando:', e);
+      }
+    }
+
+
+    // =====================================================
+    // HELPERS
+    // =====================================================
+
+    function getRemainingTime(timestamp) {
+
+      if (!timestamp) return null;
+
+      const diff = timestamp - Date.now();
+
+      if (diff <= 0) return null;
+
+      const hours = Math.floor(diff / 1000 / 60 / 60);
+      const minutes = Math.floor((diff / 1000 / 60) % 60);
+
+      return `${hours}h ${minutes}m`;
+    }
+
+
+    function getStatus(account) {
+      return getRemainingTime(account.limitReset)
+        ? 'limited'
+        : 'available';
+    }
+
+
+    // =====================================================
+    // FILTERS
+    // =====================================================
+
+    function renderFilters() {
+
+      const container = document.getElementById('filters');
+
+      const all = ['all', ...Object.keys(providers)];
+
+      const activeLabel = activeFilter === 'all' ? 'Todas las IA' : providers[activeFilter].label;
+
+      container.innerHTML = `
+        <div class="relative">
+          <button
+            onclick="toggleFilterDropdown(event)"
+            id="filter-btn"
+            class="glass px-4 py-2.5 rounded-xl text-sm font-semibold transition cursor-pointer flex items-center gap-2 border border-slate-200/60"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L13 13.414V19a1 1 0 01-.553.894l-4 2A1 1 0 017 21v-7.586L3.293 6.707A1 1 0 013 6V4z"/>
+            </svg>
+            ${activeLabel}
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+            </svg>
+          </button>
+        </div>
+      `;
+
+      // Dropdown vive en el body para escapar de cualquier overflow:hidden
+      let dd = document.getElementById('filter-dropdown');
+      if (!dd) {
+        dd = document.createElement('div');
+        dd.id = 'filter-dropdown';
+        dd.className = 'hidden bg-white rounded-2xl shadow-xl border border-slate-100 min-w-[160px] py-1';
+        dd.style.position = 'fixed';
+        dd.style.zIndex = '9999';
+        document.body.appendChild(dd);
+      }
+      dd.innerHTML = all.map(filter => `
+        <button
+          onclick="setFilter('${filter}')"
+          class="w-full text-left px-4 py-2.5 text-sm font-semibold hover:bg-slate-50 transition cursor-pointer ${activeFilter === filter ? 'text-black' : 'text-slate-600'}"
+        >
+          ${filter === 'all' ? 'Todas las IA' : providers[filter].label}
+        </button>
+      `).join('');
+    }
+
+    function toggleFilterDropdown(e) {
+      e.stopPropagation();
+      const dd = document.getElementById('filter-dropdown');
+      const btn = document.getElementById('filter-btn');
+      if (dd.classList.contains('hidden')) {
+        const rect = btn.getBoundingClientRect();
+        dd.style.top = (rect.bottom + 6) + 'px';
+        dd.style.left = rect.left + 'px';
+        dd.classList.remove('hidden');
+        setTimeout(() => {
+          document.addEventListener('click', function closeDD() {
+            dd.classList.add('hidden');
+            document.removeEventListener('click', closeDD);
+          }, { once: true });
+        }, 0);
+      } else {
+        dd.classList.add('hidden');
+      }
+    }
+
+
+    function setFilter(filter) {
+      activeFilter = filter;
+      render();
+    }
+
+
+    // =====================================================
+    // RENDER
+    // =====================================================
+
+    function render() {
+
+      renderFilters();
+
+      const container = document.getElementById('accounts-container');
+
+      const search = document.getElementById('search-input').value.toLowerCase();
+
+      let filtered = [...accounts];
+
+      if (activeFilter !== 'all') {
+        filtered = filtered.filter(acc => acc.provider === activeFilter);
+      }
+
+      if (search) {
+        filtered = filtered.filter(acc => {
+
+          const combined = `
+            ${acc.email}
+            ${acc.notes}
+            ${acc.tags.join(' ')}
+          `.toLowerCase();
+
+          return combined.includes(search);
+        });
+      }
+
+      filtered.sort((a, b) => {
+        const aLimited = getStatus(a) === 'limited';
+        const bLimited = getStatus(b) === 'limited';
+        if (aLimited !== bLimited) return aLimited ? 1 : -1;
+        if (!aLimited) return a.email.localeCompare(b.email);
+        return a.limitReset - b.limitReset;
+      });
+
+      container.innerHTML = '';
+
+
+      filtered.forEach(acc => {
+
+        const provider = providers[acc.provider] || { label: acc.provider, gradient: '', gradientStyle: '', button: '', buttonStyle: '', icon: '?' };
+        const status = getStatus(acc);
+        const remaining = getRemainingTime(acc.limitReset);
+
+
+        const row = document.createElement('div');
+
+        row.className = 'glass rounded-3xl overflow-hidden shadow-sm row-hover fade-in';
+
+
+        row.innerHTML = `
+
+        <div class="${provider.gradient ? `bg-gradient-to-r ${provider.gradient}` : ''}" style="${provider.gradientStyle || ''}; padding: 1rem 1.25rem;">
+
+          <div class="flex items-center gap-4 w-full">
+
+            <!-- ICON -->
+
+            <div class="w-11 h-11 rounded-xl bg-white shadow-md flex items-center justify-center text-[22px] flex-shrink-0">
+              ${provider.icon}
+            </div>
+
+
+            <!-- EMAIL -->
+
+            <div class="min-w-0 flex-1 max-w-[280px] truncate">
+              <div class="font-semibold text-[16px] tracking-tight text-slate-800">
+                ${acc.email}
+              </div>
+            </div>
+
+
+            <!-- DIVIDER -->
+
+            <div class="h-8 w-px bg-black/10 flex-shrink-0"></div>
+
+
+            <!-- STATUS + TIMER (ancho fijo para alineación perfecta) -->
+
+            <div class="flex items-center gap-3 flex-shrink-0" style="width:220px">
+              ${status === 'available'
+                ? `<div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-100/80 text-emerald-700 text-sm font-bold shadow-sm whitespace-nowrap">
+                    <div class="w-2.5 h-2.5 rounded-full bg-emerald-400"></div>
+                    Disponible
+                  </div>`
+                : `<div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-red-100/80 text-red-600 text-sm font-bold shadow-sm whitespace-nowrap">
+                    <div class="w-2.5 h-2.5 rounded-full bg-red-400"></div>
+                    Limitado
+                  </div>`
+              }
+              <div class="font-semibold text-[15px] tracking-tight text-slate-800 w-14 text-left">
+                ${remaining ? `<span>${remaining}</span>` : ''}
+              </div>
+            </div>
+
+
+            <!-- RIGHT ACTIONS (pegados a la derecha) -->
+
+            <div class="ml-auto flex items-center gap-2 flex-shrink-0">
+
+              <!-- LIMIT BUTTON -->
+
+              <button
+                onclick="editLimit('${acc.id}')"
+                class="${provider.button || ''} text-white px-4 py-2 rounded-xl text-sm font-semibold shadow hover:opacity-90 transition cursor-pointer whitespace-nowrap flex items-center gap-1.5"
+                style="${provider.buttonStyle || ''}"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+                </svg>
+                Límite
+              </button>
+
+
+              <!-- GEAR / SETTINGS -->
+
+              <div class="relative">
+                <button
+                  onclick="toggleAccountMenu(event, '${acc.id}')"
+                  class="w-9 h-9 rounded-xl bg-white/60 hover:bg-slate-100 flex items-center justify-center transition shadow-sm cursor-pointer"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="3"/>
+                    <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/>
+                  </svg>
+                </button>
+              </div>
+
+
+              <!-- CHEVRON -->
+
+              <button
+                onclick="toggleExpand('${acc.id}')"
+                class="w-9 h-9 rounded-xl flex items-center justify-center hover:bg-white/40 transition cursor-pointer"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 transition-transform duration-300 text-slate-700 ${acc.expanded ? 'rotate-180' : ''}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                </svg>
+              </button>
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <!-- EXPANDED PROJECTS -->
+
+        <div
+          data-panel="${acc.id}"
+          style="height:${acc.expanded ? 'auto' : '0'}; overflow:hidden; opacity:${acc.expanded ? '1' : '0'};"
+        >
+          <div style="padding: 0 1.25rem 1.25rem;">
+            <div id="projects-${acc.id}" class="space-y-2">
+              ${renderProjectCards(acc.id)}
+            </div>
+            <button
+              onclick="openNewProjectModal('${acc.id}')"
+              class="mt-3 w-full flex items-center justify-center gap-2 py-3 rounded-2xl border-2 border-dashed border-black/10 hover:border-black/20 text-sm font-semibold text-slate-500 hover:text-slate-700 transition cursor-pointer"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+              </svg>
+              Añadir proyecto
+            </button>
+          </div>
+        </div>
+
+        `;
+
+        container.appendChild(row);
+      });
+    }
+
+
+    // =====================================================
+    // ACTIONS
+    // =====================================================
+
+    async function toggleExpand(id) {
+      const acc = accounts.find(a => a.id === id);
+      acc.expanded = !acc.expanded;
+      await save();
+
+      const panel = document.querySelector(`[data-panel="${id}"]`);
+      const chevron = document.querySelector(`[data-chevron="${id}"]`);
+      if (!panel) return;
+
+      const DURATION = 320;
+      const EASING = t => t < 0.5 ? 2*t*t : -1+(4-2*t)*t;
+
+      if (acc.expanded) {
+        panel.style.height = '0';
+        panel.style.opacity = '0';
+        panel.style.overflow = 'hidden';
+        panel.style.height = 'auto';
+        const targetH = panel.scrollHeight;
+        panel.style.height = '0';
+        const start = performance.now();
+        requestAnimationFrame(function tick(now) {
+          const p = Math.min((now - start) / DURATION, 1);
+          const e = EASING(p);
+          panel.style.height = (targetH * e) + 'px';
+          panel.style.opacity = e;
+          if (chevron) chevron.style.transform = `rotate(${180 * e}deg)`;
+          if (p < 1) requestAnimationFrame(tick);
+          else { panel.style.height = 'auto'; panel.style.overflow = 'visible'; }
+        });
+      } else {
+        const startH = panel.scrollHeight;
+        panel.style.height = startH + 'px';
+        panel.style.overflow = 'hidden';
+        const start = performance.now();
+        requestAnimationFrame(function tick(now) {
+          const p = Math.min((now - start) / DURATION, 1);
+          const e = EASING(p);
+          panel.style.height = (startH * (1 - e)) + 'px';
+          panel.style.opacity = 1 - e;
+          if (chevron) chevron.style.transform = `rotate(${180 * (1 - e)}deg)`;
+          if (p < 1) requestAnimationFrame(tick);
+          else panel.style.height = '0';
+        });
+      }
+    }
+
+    async function deleteAccount(id) {
+      if (!confirm('¿Eliminar esta cuenta?')) return;
+      accounts = accounts.filter(a => a.id !== id);
+      projects = projects.filter(p => p.accountId !== id);
+      await save();
+      await saveProjects();
+      render();
+    }
+
+
+    // =====================================================
+    // PROJECTS DATA
+    // =====================================================
+
+    let projects = [];
+
+    async function loadProjects() {
+      try {
+        const res = await fetch('/projects.json');
+        projects = await res.json();
+      } catch(e) {
+        projects = [];
+      }
+    }
+
+    async function saveProjects() {
+      try {
+        await fetch('/save-projects', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(projects, null, 2)
+        });
+      } catch(e) {
+        console.error('Error guardando proyectos:', e);
+      }
+    }
+
+    function renderProjectCards(accountId) {
+      const acctProjects = projects.filter(p => p.accountId === accountId);
+      if (!acctProjects.length) return '';
+      return acctProjects.map(proj => `
+        <div class="flex items-center gap-4 bg-white/50 rounded-2xl px-4 py-3 border border-white/60">
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2 mb-1">
+              <span class="font-bold text-sm text-slate-800 truncate">${proj.name}</span>
+              ${proj.description ? `<span class="text-xs text-slate-400 truncate hidden sm:block">— ${proj.description}</span>` : ''}
+            </div>
+            <div class="flex flex-wrap gap-1.5">
+              ${(proj.prompts || []).map(pr => `
+                <button
+                  onclick="copyPrompt('${proj.id}','${pr.id}')"
+                  title="Copiar: ${pr.title}"
+                  class="prompt-chip inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-black/5 hover:bg-black/10 text-xs font-semibold text-slate-700 transition cursor-pointer"
+                  data-prompt-id="${pr.id}"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
+                  </svg>
+                  ${pr.title}
+                </button>
+              `).join('')}
+              ${!(proj.prompts || []).length ? `<span class="text-xs text-slate-400 italic">Sin prompts</span>` : ''}
+            </div>
+          </div>
+          <button
+            onclick="openEditProjectModal('${proj.id}')"
+            class="w-7 h-7 rounded-lg flex items-center justify-center hover:bg-black/5 transition cursor-pointer flex-shrink-0"
+            title="Editar proyecto"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="3"/>
+              <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/>
+            </svg>
+          </button>
+          <button
+            onclick="deleteProject('${proj.id}')"
+            class="w-7 h-7 rounded-lg flex items-center justify-center hover:bg-red-50 transition cursor-pointer flex-shrink-0"
+            title="Eliminar proyecto"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M9 7V4a1 1 0 011-1h4a1 1 0 011 1v3m-7 0h8"/>
+            </svg>
+          </button>
+        </div>
+      `).join('');
+    }
+
+    function copyPrompt(projectId, promptId) {
+      const proj = projects.find(p => p.id === projectId);
+      if (!proj) return;
+      const pr = (proj.prompts || []).find(p => p.id === promptId);
+      if (!pr) return;
+      navigator.clipboard.writeText(pr.content).then(() => {
+        const btn = document.querySelector(`[data-prompt-id="${promptId}"]`);
+        if (!btn) return;
+        const original = btn.innerHTML;
+        btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg> ¡Copiado!`;
+        btn.classList.add('bg-emerald-50', 'text-emerald-700');
+        setTimeout(() => {
+          btn.innerHTML = original;
+          btn.classList.remove('bg-emerald-50', 'text-emerald-700');
+        }, 1500);
+      });
+    }
+
+
+    // =====================================================
+    // PROJECT MODALS
+    // =====================================================
+
+    let _editingProjectId = null;
+    let _editingAccountId = null;
+
+    function openNewProjectModal(accountId) {
+      _editingProjectId = null;
+      _editingAccountId = accountId;
+      document.getElementById('project-modal-title').textContent = 'Nuevo proyecto';
+      document.getElementById('project-name').value = '';
+      document.getElementById('project-description').value = '';
+      document.getElementById('prompts-list').innerHTML = '';
+      document.getElementById('modal-project').classList.remove('hidden');
+      document.getElementById('modal-project').classList.add('flex');
+    }
+
+    function openEditProjectModal(projectId) {
+      const proj = projects.find(p => p.id === projectId);
+      if (!proj) return;
+      _editingProjectId = projectId;
+      _editingAccountId = proj.accountId;
+      document.getElementById('project-modal-title').textContent = 'Editar proyecto';
+      document.getElementById('project-name').value = proj.name;
+      document.getElementById('project-description').value = proj.description || '';
+      const list = document.getElementById('prompts-list');
+      list.innerHTML = '';
+      (proj.prompts || []).forEach(pr => addPromptRow(pr.title, pr.content, pr.id));
+      document.getElementById('modal-project').classList.remove('hidden');
+      document.getElementById('modal-project').classList.add('flex');
+    }
+
+    function closeProjectModal() {
+      document.getElementById('modal-project').classList.add('hidden');
+      document.getElementById('modal-project').classList.remove('flex');
+    }
+
+    function addPromptRow(title = '', content = '', id = null) {
+      const rowId = id || crypto.randomUUID();
+      const list = document.getElementById('prompts-list');
+      const row = document.createElement('div');
+      row.className = 'prompt-row border border-slate-200 rounded-2xl p-3 space-y-2 bg-slate-50';
+      row.dataset.promptId = rowId;
+      row.innerHTML = `
+        <div class="flex items-center gap-2">
+          <input
+            type="text"
+            placeholder="Título del prompt"
+            value="${title.replace(/"/g, '&quot;')}"
+            class="prompt-title flex-1 rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-slate-400"
+          />
+          <button onclick="this.closest('.prompt-row').remove()" class="w-7 h-7 rounded-lg flex items-center justify-center hover:bg-red-50 cursor-pointer flex-shrink-0">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+        <textarea
+          placeholder="Contenido del prompt..."
+          rows="3"
+          class="prompt-content w-full rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-slate-400 resize-none leading-relaxed"
+        >${content.replace(/</g, '&lt;')}</textarea>
+      `;
+      list.appendChild(row);
+    }
+
+    async function saveProject() {
+      const name = document.getElementById('project-name').value.trim();
+      if (!name) { alert('El proyecto necesita un nombre.'); return; }
+      const description = document.getElementById('project-description').value.trim();
+
+      const promptRows = document.querySelectorAll('#prompts-list .prompt-row');
+      const prompts = [];
+      promptRows.forEach(row => {
+        const title = row.querySelector('.prompt-title').value.trim();
+        const content = row.querySelector('.prompt-content').value.trim();
+        if (title || content) {
+          prompts.push({ id: row.dataset.promptId, title: title || 'Sin título', content });
+        }
+      });
+
+      if (_editingProjectId) {
+        const proj = projects.find(p => p.id === _editingProjectId);
+        proj.name = name;
+        proj.description = description;
+        proj.prompts = prompts;
+      } else {
+        projects.push({ id: crypto.randomUUID(), accountId: _editingAccountId, name, description, prompts });
+      }
+
+      await saveProjects();
+      closeProjectModal();
+
+      // Re-render only the project list for this account (no full render to preserve animation state)
+      const container = document.getElementById(`projects-${_editingAccountId}`);
+      if (container) container.innerHTML = renderProjectCards(_editingAccountId);
+    }
+
+    async function deleteProject(projectId) {
+      if (!confirm('¿Eliminar este proyecto?')) return;
+      const proj = projects.find(p => p.id === projectId);
+      const accountId = proj?.accountId;
+      projects = projects.filter(p => p.id !== projectId);
+      await saveProjects();
+      if (accountId) {
+        const container = document.getElementById(`projects-${accountId}`);
+        if (container) container.innerHTML = renderProjectCards(accountId);
+      }
+    }
+
+
+    // =====================================================
+    // LIMITS
+    // =====================================================
+
+    function editLimit(id) {
+      const acc = accounts.find(a => a.id === id);
+
+      // Calculate current reset time in HH:MM for the input default
+      let defaultTime = '';
+      if (acc.limitReset && acc.limitReset > Date.now()) {
+        const d = new Date(acc.limitReset);
+        defaultTime = `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+      }
+
+      // Open limit modal
+      document.getElementById('limit-account-id').value = id;
+      document.getElementById('limit-time-input').value = defaultTime;
+      document.getElementById('modal-limit').classList.remove('hidden');
+      document.getElementById('modal-limit').classList.add('flex');
+      document.getElementById('limit-time-input').focus();
+    }
+
+    function closeLimitModal() {
+      document.getElementById('modal-limit').classList.add('hidden');
+      document.getElementById('modal-limit').classList.remove('flex');
+    }
+
+    async function saveLimit() {
+      const id = document.getElementById('limit-account-id').value;
+      const timeVal = document.getElementById('limit-time-input').value;
+      const acc = accounts.find(a => a.id === id);
+
+      if (!timeVal) {
+        acc.limitReset = null;
+      } else {
+        const [h, m] = timeVal.split(':').map(Number);
+        const now = new Date();
+        const target = new Date();
+        target.setHours(h, m, 0, 0);
+        if (target <= now) target.setDate(target.getDate() + 1);
+        acc.limitReset = target.getTime();
+      }
+
+      await save();
+      closeLimitModal();
+      render();
+    }
+
+
+    // =====================================================
+    // MODALS
+    // =====================================================
+
+    function openModal() {
+      document.getElementById('modal-add').classList.remove('hidden');
+      document.getElementById('modal-add').classList.add('flex');
+    }
+
+
+    function closeModal() {
+
+      document.getElementById('modal-add').classList.add('hidden');
+      document.getElementById('modal-add').classList.remove('flex');
+
+      document.getElementById('new-email').value = '';
+      document.getElementById('new-tags').value = '';
+    }
+
+
+    function openProjectsModal(id) {
+
+      const acc = accounts.find(a => a.id === id);
+
+      document.getElementById('edit-project-account-id').value = id;
+
+      document.getElementById('edit-project-textarea').value = acc.notes || '';
+
+      document.getElementById('modal-project-title').innerText = `Editar proyectos — ${acc.email}`;
+
+      updateCounter();
+
+      document.getElementById('modal-projects').classList.remove('hidden');
+      document.getElementById('modal-projects').classList.add('flex');
+    }
+
+
+    function closeProjectsModal() {
+      document.getElementById('modal-projects').classList.add('hidden');
+      document.getElementById('modal-projects').classList.remove('flex');
+    }
+
+
+    // =====================================================
+    // ADD ACCOUNT
+    // =====================================================
+
+    async function addNewAccount() {
+      const email = document.getElementById('new-email').value.trim();
+      const provider = document.getElementById('new-ia').value;
+      const tags = document.getElementById('new-tags')
+        .value
+        .split(',')
+        .map(tag => tag.trim())
+        .filter(Boolean);
+
+      if (!email) {
+        alert('Introduce un correo.');
+        return;
+      }
+
+      accounts.unshift({
+        id: crypto.randomUUID(),
+        provider,
+        email,
+        limitReset: null,
+        notes: '',
+        tags,
+        expanded: false
+      });
+
+      await save();
+      closeModal();
+      render();
+    }
+
+
+    // =====================================================
+    // MODAL TABS
+    // =====================================================
+
+    function switchTab(tab) {
+      const isAccount = tab === 'account';
+      document.getElementById('panel-account').classList.toggle('hidden', !isAccount);
+      document.getElementById('panel-provider').classList.toggle('hidden', isAccount);
+      document.getElementById('tab-account').className = `flex-1 py-2 rounded-xl text-sm font-semibold transition cursor-pointer ${isAccount ? 'bg-white shadow-sm text-slate-800' : 'text-slate-500'}`;
+      document.getElementById('tab-provider').className = `flex-1 py-2 rounded-xl text-sm font-semibold transition cursor-pointer ${!isAccount ? 'bg-white shadow-sm text-slate-800' : 'text-slate-500'}`;
+    }
+
+
+    // =====================================================
+    // GEAR CONTEXT MENU
+    // =====================================================
+
+    function toggleAccountMenu(e, id) {
+      e.stopPropagation();
+      // Remove any existing menu
+      document.getElementById('account-menu')?.remove();
+
+      const btn = e.currentTarget;
+      const rect = btn.getBoundingClientRect();
+
+      const menu = document.createElement('div');
+      menu.id = 'account-menu';
+      menu.style.cssText = `position:fixed;top:${rect.bottom + 6}px;left:${rect.left}px;z-index:9999;`;
+      menu.className = 'bg-white rounded-2xl shadow-xl border border-slate-100 py-1 min-w-[140px]';
+      menu.innerHTML = `
+        <button onclick="openEditModal('${id}'); document.getElementById('account-menu')?.remove();"
+          class="w-full text-left px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+          </svg>
+          Editar
+        </button>
+        <button onclick="deleteAccount('${id}'); document.getElementById('account-menu')?.remove();"
+          class="w-full text-left px-4 py-2.5 text-sm font-semibold text-red-500 hover:bg-red-50 cursor-pointer flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M9 7V4a1 1 0 011-1h4a1 1 0 011 1v3m-7 0h8"/>
+          </svg>
+          Eliminar
+        </button>
+      `;
+      document.body.appendChild(menu);
+      setTimeout(() => {
+        document.addEventListener('click', function closeMenu() {
+          menu.remove();
+          document.removeEventListener('click', closeMenu);
+        }, { once: true });
+      }, 0);
+    }
+
+
+    // =====================================================
+    // EDIT ACCOUNT
+    // =====================================================
+
+    function openEditModal(id) {
+      const acc = accounts.find(a => a.id === id);
+      document.getElementById('edit-account-id').value = id;
+      document.getElementById('edit-email').value = acc.email;
+      document.getElementById('edit-tags').value = acc.tags.join(', ');
+
+      const sel = document.getElementById('edit-ia');
+      sel.innerHTML = Object.entries(providers)
+        .map(([key, p]) => `<option value="${key}" ${key === acc.provider ? 'selected' : ''}>${p.label}</option>`)
+        .join('');
+
+      document.getElementById('modal-edit').classList.remove('hidden');
+      document.getElementById('modal-edit').classList.add('flex');
+    }
+
+    function closeEditModal() {
+      document.getElementById('modal-edit').classList.add('hidden');
+      document.getElementById('modal-edit').classList.remove('flex');
+    }
+
+    async function saveEditAccount() {
+      const id = document.getElementById('edit-account-id').value;
+      const acc = accounts.find(a => a.id === id);
+      acc.email = document.getElementById('edit-email').value.trim();
+      acc.provider = document.getElementById('edit-ia').value;
+      acc.tags = document.getElementById('edit-tags').value.split(',').map(t => t.trim()).filter(Boolean);
+      await save();
+      closeEditModal();
+      render();
+    }
+
+
+    // =====================================================
+    // ADD CUSTOM PROVIDER
+    // =====================================================
+
+    function addNewProvider() {
+      const name = document.getElementById('new-provider-name').value.trim();
+      const svg  = document.getElementById('new-provider-svg').value.trim();
+      const c1   = document.getElementById('new-provider-color1').value;
+      const c2   = document.getElementById('new-provider-color2').value;
+      const btn  = document.getElementById('new-provider-btn-color').value;
+
+      if (!name || !svg) { alert('Nombre y SVG son obligatorios.'); return; }
+
+      const key = name.toLowerCase().replace(/\s+/g, '-');
+      providers[key] = {
+        label: name,
+        gradient: '',
+        gradientStyle: `background: linear-gradient(to right, ${c1}, ${c2})`,
+        button: '',
+        buttonStyle: `background-color: ${btn}`,
+        icon: svg
+      };
+
+      initProviderSelect();
+      switchTab('account');
+      document.getElementById('new-ia').value = key;
+      // clear fields
+      document.getElementById('new-provider-name').value = '';
+      document.getElementById('new-provider-svg').value = '';
+    }
+
+
+    // =====================================================
+    // EXPORT
+    // =====================================================
+
+    function exportData() {
+      const data = JSON.stringify(accounts, null, 2);
+      const blob = new Blob([data], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'ai-dashboard-backup.json';
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+
+    // =====================================================
+    // THEME
+    // =====================================================
+
+    function toggleTheme() {
+      const body = document.body;
+      body.classList.toggle('dark');
+      body.classList.toggle('light');
+      const isDark = body.classList.contains('dark');
+      document.getElementById('icon-moon').classList.toggle('hidden', isDark);
+      document.getElementById('icon-sun').classList.toggle('hidden', !isDark);
+    }
+
+
+    // =====================================================
+    // INIT
+    // =====================================================
+
+    function initProviderSelect() {
+      const opts = Object.entries(providers)
+        .map(([key, p]) => `<option value="${key}">${p.label}</option>`)
+        .join('');
+      const sel = document.getElementById('new-ia');
+      if (sel) sel.innerHTML = opts;
+    }
+
+    async function init() {
+      await Promise.all([loadAccounts(), loadProjects()]);
+      render();
+    }
+
+    initProviderSelect();
+    init();
+
+  </script>
+</body>
+</html>
