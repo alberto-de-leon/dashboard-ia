@@ -7,14 +7,14 @@ A local dashboard to manage your AI accounts — track usage limits, organize pr
 ### Screenshots
 
 **Vista general**
-![Vista general](pagina_principal.png)
+![Vista general](assets/pagina_principal.png)
 
 **Proyectos y prompts**
-![Paso 1 creacion proyecto](registrar_proyecto_1.png)
-![Paso 2 creacion proyecto](registrar_proyecto_2.png)
+![Paso 1 creacion proyecto](assets/registrar_proyecto_1.png)
+![Paso 2 creacion proyecto](assets/registrar_proyecto_2.png)
 
 **Vista desplegada con proyecto**
-![Vista con proyectos](acceder_proyectos_guardados.png)
+![Vista con proyectos](assets/acceder_proyectos_guardados.png)
 Esto te permite tener los prompts que utilizas y con solo pulsar encima se copia en tu portapapeles. 
 ---
 
