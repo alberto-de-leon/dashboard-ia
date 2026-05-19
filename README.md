@@ -1,6 +1,6 @@
 # Dashboard IA
 
-A local dashboard to manage your AI accounts — track usage limits, organize projects and copy prompts in one click. No cloud, no subscriptions, runs entirely on your machine.
+A local dashboard to manage your AI accounts - track usage limits, organize projects and copy prompts in one click. No cloud, no subscriptions, runs entirely on your machine.
 
 > También disponible en español más abajo.
 
@@ -18,14 +18,14 @@ A clean, minimal dashboard to keep track of your AI accounts (Claude, ChatGPT, G
 |------|-------------|
 | `index.html` | The web app |
 | `server.js` | Local server (don't touch) |
-| `accounts.example.json` | Rename to `accounts.json` — your accounts are stored here |
-| `projects.example.json` | Rename to `projects.json` — your projects and prompts are stored here |
+| `accounts.example.json` | Rename to `accounts.json` - your accounts are stored here |
+| `projects.example.json` | Rename to `projects.json` - your projects and prompts are stored here |
 | `Abrir Dashboard.bat` | Double-click to launch (Windows) |
 
 ### Requirements
 
 - Windows
-- [Node.js LTS](https://nodejs.org) — free, one-time install
+- [Node.js LTS](https://nodejs.org) - free, one-time install
 
 ### First time setup
 
@@ -36,11 +36,11 @@ A clean, minimal dashboard to keep track of your AI accounts (Claude, ChatGPT, G
 5. Double-click `Abrir Dashboard.bat`
    - A black terminal window opens (the local server)
    - Your browser opens automatically at `http://localhost:3000`
-6. Done — add your accounts and start using it
+6. Done - add your accounts and start using it
 
 ### Daily use
 
-Just double-click `Abrir Dashboard.bat`. Keep the black window open while using the dashboard — closing it stops the server.
+Just double-click `Abrir Dashboard.bat`. Keep the black window open while using the dashboard - closing it stops the server.
 
 ### Editing accounts manually
 
@@ -63,7 +63,7 @@ Supported providers: `claude`, `chatgpt`, `gemini`. The order in the JSON is the
 
 ### Backup / moving to another computer
 
-Copy the entire folder. That's it — `accounts.json` and `projects.json` contain everything.
+Copy the entire folder. That's it - `accounts.json` and `projects.json` contain everything.
 
 ### Desktop shortcut
 
@@ -85,14 +85,14 @@ Un dashboard limpio y minimalista para gestionar tus cuentas de IA (Claude, Chat
 |---------|-------------|
 | `index.html` | La aplicación web |
 | `server.js` | El servidor local (no tocar) |
-| `accounts.example.json` | Renómbralo a `accounts.json` — aquí se guardan tus cuentas |
-| `projects.example.json` | Renómbralo a `projects.json` — aquí se guardan tus proyectos y prompts |
+| `accounts.example.json` | Renómbralo a `accounts.json` - aquí se guardan tus cuentas |
+| `projects.example.json` | Renómbralo a `projects.json` - aquí se guardan tus proyectos y prompts |
 | `Abrir Dashboard.bat` | Doble clic para arrancar |
 
 ### Requisitos
 
 - Windows
-- [Node.js LTS](https://nodejs.org) — gratuito, instalación única
+- [Node.js LTS](https://nodejs.org) - gratuito, instalación única
 
 ### Primer uso
 
@@ -107,7 +107,7 @@ Un dashboard limpio y minimalista para gestionar tus cuentas de IA (Claude, Chat
 
 ### Uso diario
 
-Doble clic en `Abrir Dashboard.bat`. Mantén la ventana negra abierta mientras usas el dashboard — al cerrarla se para el servidor.
+Doble clic en `Abrir Dashboard.bat`. Mantén la ventana negra abierta mientras usas el dashboard - al cerrarla se para el servidor.
 
 ### Editar cuentas a mano
 
@@ -130,7 +130,7 @@ Proveedores disponibles: `claude`, `chatgpt`, `gemini`. El orden en el JSON es e
 
 ### Backup / mover a otro ordenador
 
-Copia toda la carpeta. Con eso es suficiente — `accounts.json` y `projects.json` contienen todo.
+Copia toda la carpeta. Con eso es suficiente - `accounts.json` y `projects.json` contienen todo.
 
 ### Acceso directo en el escritorio
 
@@ -142,4 +142,4 @@ Copia toda la carpeta. Con eso es suficiente — `accounts.json` y `projects.jso
 
 ## License
 
-MIT — free to use, modify and share. Credits appreciated but not required.
+MIT - free to use, modify and share. Credits appreciated but not required.
