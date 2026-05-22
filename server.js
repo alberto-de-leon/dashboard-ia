@@ -11,6 +11,7 @@ const MIME = {
   '.json': 'application/json',
   '.css':  'text/css',
   '.png':  'image/png',
+  '.svg':  'image/svg+xml',
   '.ico':  'image/x-icon',
 };
 
@@ -47,8 +48,15 @@ const server = http.createServer((req, res) => {
     return;
   }
 
+  if (req.method === 'POST' && req.url === '/save-providers') {
+    let body = '';
+    req.on('data', chunk => body += chunk);
+    req.on('end', () => saveJSON('providers.json', body, res));
+    return;
+  }
+
   let filePath = req.url === '/' ? '/index.html' : req.url;
-  filePath = path.join(DIR, filePath);
+  filePath = path.join(DIR, decodeURIComponent(filePath));
 
   fs.readFile(filePath, (err, data) => {
     if (err) { res.writeHead(404); res.end('No encontrado'); return; }
@@ -60,7 +68,7 @@ const server = http.createServer((req, res) => {
 
 server.listen(PORT, '0.0.0.0', () => {
   console.log('');
-  console.log('  Dashboard IA funcionando');
+  console.log('  OrbIAt funcionando');
   console.log('  Abre tu navegador en: http://localhost:' + PORT);
   console.log('');
   console.log('  Para cerrar el servidor pulsa Ctrl+C');
